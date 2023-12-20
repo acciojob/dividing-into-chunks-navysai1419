@@ -1,28 +1,42 @@
-const divide = (arr, n) => {
-  const result = [];
-  let currentSubarray = [];
-  let currentSum = 0;
+const readline = require('readline');
 
-  for (const num of arr) {
-    // Check if adding the current number exceeds the maximum sum
-    if (currentSum + num > n) {
-      // Start a new subarray
-      result.push(currentSubarray);
-      currentSubarray = [num];
-      currentSum = num;
-    } else {
-      // Add the current number to the current subarray
-      currentSubarray.push(num);
-      currentSum += num;
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function createSubarrays(arr, n) {
+    const result = [];
+    let currentSubarray = [];
+
+    for (const num of arr) {
+        if (currentSubarray.reduce((acc, val) => acc + val, 0) + num <= n) {
+            currentSubarray.push(num);
+        } else {
+            result.push([...currentSubarray]);
+            currentSubarray = [num];
+        }
     }
-  }
 
-  // Add the last subarray to the result
-  result.push(currentSubarray);
+    // Add the last subarray
+    result.push([...currentSubarray]);
 
-  return result;
-};
+    return result;
+}
 
-const arr = [1, 2, 3, 4, 1, 0, 2, 2];
-const n = prompt("Enter n: ");
-alert(JSON.stringify(divide(arr, parseInt(n, 10))));
+// Get input from the user
+rl.question("Enter space-separated numbers for the input array: ", function (input) {
+    const inputArray = input.split(" ").map(Number);
+
+    rl.question("Enter the maximum sum: ", function (maxSum) {
+        // Check if the input is valid
+        if (!isNaN(maxSum) && Array.isArray(inputArray) && inputArray.every(num => !isNaN(num))) {
+            const result = createSubarrays(inputArray, parseFloat(maxSum));
+            console.log("Result:", result);
+        } else {
+            console.error("Invalid input. Please enter valid numbers.");
+        }
+
+        rl.close();
+    });
+});
